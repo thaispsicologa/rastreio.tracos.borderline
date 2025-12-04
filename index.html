@@ -1,470 +1,716 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rastreio de Traço Borderline — v4</title>
-  <meta name="description" content="Triagem de traços borderline (uso clínico orientativo, não diagnóstico)." />
-  <meta property="og:title" content="Rastreio de Traço Borderline" />
-  <meta property="og:description" content="Avaliação de traços de personalidade (uso orientativo)." />
-  <meta property="og:type" content="website" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rastreio de Traço Borderline — v4</title>
+    <meta name="description" content="Triagem de traços borderline (uso clínico orientativo, não diagnóstico)." />
+    <meta property="og:title" content="Rastreio de Traço Borderline" />
+    <meta property="og:description" content="Avaliação de traços de personalidade (uso orientativo)." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://thaispsicologa.github.io/rastreio.tracos.borderline/" />
+    <link rel="canonical" href="https://thaispsicologa.github.io/rastreio.tracos.borderline/" />
 
-  <!-- JustGage deps (ordem correta) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/justgage/1.4.0/justgage.css" />
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/justgage/1.4.0/justgage.min.js"></script>
-  
-  <style>
-    :root {
-      --bg: #0b1220;           /* noite */
-      --panel: #ffffff;
-      --panel-rgb: 255,255,255;
-      --ink: #0b1220;
-      --ink-muted: #4b5563;
-      --brand: #10b981; /* emerald-500 */
-      --brand-ink: #064e3b; /* emerald-900 */
-      --accent: #3b82f6; /* blue-500 */
-      --danger: #ef4444; /* red-500 */
-      --warn: #f59e0b;   /* amber-500 */
-      --text-on-dark: #e5e7eb;
-    }
-    /* Tema dia */
-    .theme-day {
-      --bg: #f4f7fb;
-      --text-on-dark: #111827;
-    }
+    <!-- JustGage deps (ordem correta) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/justgage/1.4.0/justgage.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/justgage/1.4.0/justgage.min.js"></script>
 
-    html, body { height: 100%; }
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      margin: 0;
-      background: var(--bg);
-      color: var(--text-on-dark);
-      transition: background .25s ease, color .25s ease;
-    }
+    <style>
+        :root {
+            --bg: #0b1220;
+            /* noite */
+            --panel: #ffffff;
+            --panel-rgb: 255, 255, 255;
+            --ink: #0b1220;
+            --ink-muted: #4b5563;
+            --brand: #10b981;
+            /* emerald-500 */
+            --brand-ink: #064e3b;
+            /* emerald-900 */
+            --accent: #3b82f6;
+            /* blue-500 */
+            --danger: #ef4444;
+            /* red-500 */
+            --warn: #f59e0b;
+            /* amber-500 */
+            --text-on-dark: #e5e7eb;
+        }
 
-    header {
-      position: relative;
-      padding: 28px 16px 56px;
-      text-align: center;
-      background: linear-gradient(180deg, rgba(16,185,129,.15), rgba(59,130,246,.10));
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      overflow: hidden;
-    }
-    .banner {
-      position:absolute; inset:0; pointer-events:none;
-      background: url('https://i.pinimg.com/originals/4c/36/60/4c36602eccb8230a72b6c60b7a4bc2fe.jpg') center/cover no-repeat;
-      opacity:.18;
-      filter: saturate(0.9) contrast(1.1);
-    }
-    header h1 { margin: 0; font-weight: 800; letter-spacing: .2px; position:relative; }
-    header p { position:relative; margin:.25rem 0 0; opacity:.85 }
+        /* Tema dia */
+        .theme-day {
+            --bg: #f4f7fb;
+            --text-on-dark: #111827;
+        }
 
-    .header-actions { position:relative; margin-top:16px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
-    .toggle { display:inline-flex; align-items:center; gap:8px; background: rgba(255,255,255,.15); padding:6px 10px; border-radius:999px; }
-    .toggle input { accent-color: var(--brand); }
-    .panic { display:inline-flex; align-items:center; gap:8px; background: var(--danger); color:#fff; border:none; border-radius:999px; padding:10px 14px; font-weight:800; cursor:pointer; }
+        html,
+        body {
+            height: 100%;
+        }
 
-    main { max-width: 960px; margin: 32px auto; padding: 0 16px 48px; }
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            margin: 0;
+            background: var(--bg);
+            color: var(--text-on-dark);
+            transition: background .25s ease, color .25s ease;
+        }
 
-    .panel { background: rgba(var(--panel-rgb), .98); color: var(--ink); border-radius: 16px; box-shadow: 0 10px 24px rgba(0,0,0,.25); padding: 24px; }
-    .disclaimer { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 16px 0 24px; font-size: 14px; color: #334155; }
+        header {
+            position: relative;
+            padding: 28px 16px 56px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(16, 185, 129, .15), rgba(59, 130, 246, .10));
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            overflow: hidden;
+        }
 
-    .onboarding { background:#0f172a; color:#e2e8f0; border-radius:12px; padding:16px; line-height:1.6; }
-    .onboarding h3{ margin:0 0 8px; }
-    .onboarding ol{ margin:0; padding-left:18px; }
+        .banner {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: url('https://i.pinimg.com/originals/4c/36/60/4c36602eccb8230a72b6c60b7a4bc2fe.jpg') center/cover no-repeat;
+            opacity: .18;
+            filter: saturate(0.9) contrast(1.1);
+        }
 
-    .patient-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    @media (max-width: 640px){ .patient-grid{ grid-template-columns: 1fr; } }
+        header h1 {
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: .2px;
+            position: relative;
+        }
 
-    label { font-size: 14px; color: var(--ink); font-weight: 600; }
-    input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; background: #ffffff; color: var(--ink); font-size: 15px; }
-    textarea { min-height: 120px; }
+        header p {
+            position: relative;
+            margin: .25rem 0 0;
+            opacity: .85
+        }
 
-    .instructions { color: var(--ink-muted); font-size: 15px; line-height: 1.5; }
+        .header-actions {
+            position: relative;
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
 
-    .question { background: #f0fdf4; border-left: 4px solid var(--brand); padding: 12px; border-radius: 10px; }
-    .question.invalid { outline: 2px solid #ef4444; background:#fff1f2; }
-    .q-list { display: grid; gap: 10px; }
+        .toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, .15);
+            padding: 6px 10px;
+            border-radius: 999px;
+        }
 
-    .actions { display:flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
-    button { cursor: pointer; border: 0; padding: 12px 16px; border-radius: 12px; font-weight: 700; }
-    .btn-primary { background: var(--brand); color: white; }
-    .btn-outline { background: transparent; color: var(--brand); border: 2px solid var(--brand); }
-    .btn-neutral { background: #e5e7eb; color:#111827; }
+        .toggle input {
+            accent-color: var(--brand);
+        }
 
-    .gauge-box { margin-top: 20px; }
-    .results { margin-top: 16px; line-height: 1.6; }
-    .results h2 { margin: 0 0 6px; }
-    .hidden { display:none !important; }
+        .panic {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-weight: 800;
+            cursor: pointer;
+        }
 
-    .report-box { margin-top:16px; }
+        main {
+            max-width: 960px;
+            margin: 32px auto;
+            padding: 0 16px 48px;
+        }
 
-    footer { color:#94a3b8; text-align:center; padding:24px 12px; font-size:13px; }
-    footer a { color:#3b82f6; text-decoration:none; }
-    footer a:hover{ text-decoration:underline; }
+        .panel {
+            background: rgba(var(--panel-rgb), .98);
+            color: var(--ink);
+            border-radius: 16px;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .25);
+            padding: 24px;
+        }
 
-    /* Botão de pânico fixo */
-    .panic-fab { position: fixed; right: 16px; bottom: 16px; z-index: 50; }
-    .panic-fab a { display:inline-flex; align-items:center; gap:10px; background: var(--danger); color:#fff; padding: 12px 16px; border-radius: 999px; font-weight:800; text-decoration:none; box-shadow:0 8px 24px rgba(239,68,68,.4); }
-  </style>
+        .disclaimer {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0 24px;
+            font-size: 14px;
+            color: #334155;
+        }
+
+        .onboarding {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            line-height: 1.6;
+        }
+
+        .onboarding h3 {
+            margin: 0 0 8px;
+        }
+
+        .onboarding ol {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .patient-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        @media (max-width: 640px) {
+            .patient-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        label {
+            font-size: 14px;
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #ffffff;
+            color: var(--ink);
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 120px;
+        }
+
+        .instructions {
+            color: var(--ink-muted);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .question {
+            background: #f0fdf4;
+            border-left: 4px solid var(--brand);
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .question.invalid {
+            outline: 2px solid #ef4444;
+            background: #fff1f2;
+        }
+
+        .q-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        button {
+            cursor: pointer;
+            border: 0;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: var(--brand);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--brand);
+            border: 2px solid var(--brand);
+        }
+
+        .btn-neutral {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .gauge-box {
+            margin-top: 20px;
+        }
+
+        .results {
+            margin-top: 16px;
+            line-height: 1.6;
+        }
+
+        .results h2 {
+            margin: 0 0 6px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .report-box {
+            margin-top: 16px;
+        }
+
+        footer {
+            color: #94a3b8;
+            text-align: center;
+            padding: 24px 12px;
+            font-size: 13px;
+        }
+
+        footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Botão de pânico fixo */
+        .panic-fab {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 50;
+        }
+
+        .panic-fab a {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--danger);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 999px;
+            font-weight: 800;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, .4);
+        }
+    </style>
 </head>
+
 <body class="theme-night">
-  <header>
-    <div class="banner" aria-hidden="true"></div>
-    <h1>Rastreio de Traço Borderline — Triagem</h1>
-    <p>Uso orientativo. Não substitui avaliação clínica completa (DSM-5-TR).</p>
-    <div class="header-actions">
-      <label class="toggle" title="Alternar modo dia/noite">
-        <input type="checkbox" id="modeToggle" /> <span>Modo dia</span>
-      </label>
-      <button class="panic" type="button" onclick="window.location.href='tel:188'">Botão do pânico 188</button>
-    </div>
-  </header>
-
-  <main>
-    <section class="panel" aria-labelledby="intro-title">
-      <h2 id="intro-title" style="margin-top:0">Onboarding — como responder</h2>
-      <div class="onboarding" role="note">
-        <h3>Antes de começar</h3>
-        <ol>
-          <li>Responda com base nas <strong>últimas semanas</strong>, pensando no seu funcionamento habitual.</li>
-          <li>Leia cada item e selecione uma opção. <strong>Todas as questões são obrigatórias</strong>.</li>
-          <li>Se houver itens sem resposta, a correção será bloqueada e os itens ficarão <strong>destacados em vermelho</strong>.</li>
-          <li>O resultado indica <strong>níveis de traços</strong>; <u>não é diagnóstico</u>. Em caso de sofrimento intenso ou risco, use o botão 188.</li>
-        </ol>
-      </div>
-
-      <p class="instructions" style="margin-top:12px">Escala de frequência: <strong>Nunca/Raramente – Ocasionalmente – Frequentemente – Quase sempre/Sempre</strong>. Em caso de ideação suicida, procure ajuda imediata (Ligue 188 – CVV).</p>
-
-      <div class="disclaimer">Este instrumento é apenas <em>rastreio</em>. Escores e cortes são provisórios e dependem de validação psicométrica. Utilize sempre em conjunto com entrevista clínica e critérios do DSM‑5‑TR.</div>
-
-      <form id="form" novalidate>
-        <fieldset style="border:0; padding:0; margin:0 0 16px">
-          <legend class="visualmente-oculto">Identificação</legend>
-          <div class="patient-grid">
-            <div>
-              <label for="fullName">Nome completo</label>
-              <input id="fullName" name="fullName" type="text" autocomplete="name" placeholder="Seu nome" />
-            </div>
-            <div>
-              <label for="date">Data do teste</label>
-              <input id="date" name="date" type="date" />
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset style="border:0; padding:0; margin:0">
-          <legend class="visualmente-oculto">Itens do questionário</legend>
-          <div class="q-list" id="qList"></div>
-        </fieldset>
-
-        <div class="actions">
-          <button type="button" class="btn-primary" id="btnCalc">Calcular</button>
-          <button type="button" class="btn-outline hidden" id="btnWhats">Enviar ao meu psicólogo</button>
-          <button type="button" class="btn-neutral hidden" id="btnCopy">Copiar relatório</button>
+    <header>
+        <div class="banner" aria-hidden="true"></div>
+        <h1>Rastreio de Traço Borderline — Triagem</h1>
+        <p>Uso orientativo. Não substitui avaliação clínica completa (DSM-5-TR).</p>
+        <div class="header-actions">
+            <label class="toggle" title="Alternar modo dia/noite">
+                <input type="checkbox" id="modeToggle" /> <span>Modo dia</span>
+            </label>
+            <button class="panic" type="button" onclick="window.location.href='tel:188'">Botão do pânico 188</button>
         </div>
-      </form>
+    </header>
 
-      <div class="gauge-box">
-        <div id="gauge" style="width:100%; max-width:700px; margin-inline:auto"></div>
-      </div>
+    <main>
+        <section class="panel" aria-labelledby="intro-title">
+            <h2 id="intro-title" style="margin-top:0">Onboarding — como responder</h2>
+            <div class="onboarding" role="note">
+                <h3>Antes de começar</h3>
+                <ol>
+                    <li>Responda com base nas <strong>últimas semanas</strong>, pensando no seu funcionamento habitual.</li>
+                    <li>Leia cada item e selecione uma opção. <strong>Todas as questões são obrigatórias</strong>.</li>
+                    <li>Se houver itens sem resposta, a correção será bloqueada e os itens ficarão <strong>destacados em vermelho</strong>.</li>
+                    <li>O resultado indica <strong>níveis de traços</strong>; <u>não é diagnóstico</u>. Em caso de sofrimento intenso ou risco, use o botão 188.</li>
+                </ol>
+            </div>
 
-      <div class="results" id="results" aria-live="polite"></div>
+            <p class="instructions" style="margin-top:12px">Escala de frequência: <strong>Nunca/Raramente – Ocasionalmente – Frequentemente – Quase sempre/Sempre</strong>. Em caso de ideação suicida, procure ajuda imediata (Ligue 188 – CVV).</p>
 
-      <div class="report-box hidden" id="reportBox">
-        <h3>Relatório Integrado (uso orientativo)</h3>
-        <textarea id="reportText" readonly></textarea>
-      </div>
-    </section>
-  </main>
+            <div class="disclaimer">Este instrumento é apenas <em>rastreio</em>. Escores e cortes são provisórios e dependem de validação psicométrica. Utilize sempre em conjunto com entrevista clínica e critérios do DSM-5-TR.</div>
 
-  <div class="panic-fab"><a href="tel:188" aria-label="Ligar 188 CVV">⚠️ 188 – Ajuda agora</a></div>
+            <form id="form" novalidate>
+                <fieldset style="border:0; padding:0; margin:0 0 16px">
+                    <legend class="visualmente-oculto">Identificação</legend>
+                    <div class="patient-grid">
+                        <div>
+                            <label for="fullName">Nome completo</label>
+                            <input id="fullName" name="fullName" type="text" autocomplete="name" placeholder="Seu nome" />
+                        </div>
+                        <div>
+                            <label for="date">Data do teste</label>
+                            <input id="date" name="date" type="date" />
+                        </div>
+                    </div>
+                </fieldset>
 
-  <footer>
-    <div>Thaís Campos, Psicóloga Clínica — © 2025 • Este conteúdo é orientativo e não substitui avaliação clínica.</div>
-    <div>Em caso de emergência: <a href="tel:188">ligue 188 (CVV)</a>. Atendimento 24h.</div>
-  </footer>
+                <fieldset style="border:0; padding:0; margin:0">
+                    <legend class="visualmente-oculto">Itens do questionário</legend>
+                    <div class="q-list" id="qList"></div>
+                </fieldset>
 
-  <script>
-    // ===== Configuração dos itens =====
-    const ITEMS = [
-      "Tenho dificuldades em controlar meus impulsos, como gastar dinheiro ou dirigir de forma imprudente.",
-      "Frequentemente sinto um vazio dentro de mim, como se algo estivesse faltando.",
-      "Tenho medo de que as pessoas importantes para mim me deixem.",
-      "Eu sinto que meus relacionamentos são estáveis e duradouros.", // R
-      "Minhas emoções mudam com muita frequência ao longo do dia.",
-      "Às vezes, sinto vontade de me machucar ou tirar minha própria vida.",
-      "Tenho dificuldades em saber quem eu realmente sou.",
-      "Eu frequentemente ajo por impulso, sem considerar o impacto nos outros.",
-      "Sinto-me ansiosa(o) quando alguém próximo a mim não está disponível.",
-      "Eu consigo controlar minhas emoções de maneira eficaz.", // R
-      "Às vezes, sinto que sou várias pessoas diferentes em uma só.",
-      "Eu já considerei seriamente acabar com minha própria vida.",
-      "Eu me preocupo excessivamente com o fato de que as pessoas que amo podem me abandonar.",
-      "Minha emoção muda de maneira muito rápida, e às vezes sinto que não posso controlá-la.",
-      "Tenho uma sensação persistente de que nada me satisfaz completamente.",
-      "Eu sou cuidadosa(o) e penso bem antes de agir.", // R
-      "Eu tenho dificuldade em controlar minha raiva, o que pode levar a explosões.",
-      "Meus relacionamentos são intensos e mudam rapidamente de bons para ruins.",
-      "Eu sinto raiva intensa com frequência, mesmo por coisas pequenas.",
-      "Eu frequentemente tento agradar os outros para evitar que me deixem.",
-      "Eu rapidamente passo de gostar muito de alguém para não gostar nada dessa pessoa.",
-      "Tenho pensamentos suicidas quando estou me sentindo muito mal.",
-      "Sinto que estou sempre à procura de algo que preencha o vazio dentro de mim.",
-      "Às vezes, tomo decisões impulsivas que depois me arrependo.",
-      "Frequentemente sinto que minha autoimagem muda drasticamente em curtos períodos de tempo.",
-      "Minhas emoções são como uma montanha-russa, mudando rapidamente de feliz para triste ou irritada(o).",
-      "Eu idealizo as pessoas e, logo em seguida, fico profundamente desapontada(o) com elas.",
-      "Eu me envolvo em comportamentos arriscados ou perigosos sem pensar nas consequências.",
-      "Tenho dificuldades em manter relacionamentos estáveis.",
-      "Geralmente me sinto em paz com quem eu sou.", // R
-      "Eu me sinto dominada(o) por minhas emoções, e isso me causa sofrimento.",
-      "Minhas emoções mudam de maneira intensa, sem que eu consiga controlá-las.",
-      "Eu já me machuquei intencionalmente para lidar com a dor emocional.",
-      "Eu temo que as pessoas me abandonem se eu não corresponder às suas expectativas.",
-      "Meus relacionamentos são marcados por altos e baixos emocionais intensos.",
-      "Eu consigo controlar minha raiva de maneira eficaz.", // R
-      "Eu tenho dificuldades em planejar minhas ações antes de executá-las.",
-      "As pessoas próximas a mim muitas vezes dizem que sou imprevisível em meus relacionamentos.",
-      "Eu me preocupo constantemente que, se não agir de certa maneira, serei abandonada(o).",
-      "Tenho episódios de tristeza profunda que aparecem sem motivo aparente.",
-      "Tenho dificuldades em encontrar sentido ou propósito nas coisas que faço.",
-      "Eu faço grandes esforços para evitar que as pessoas se afastem de mim.",
-      "Eu sinto que minha autoimagem muda conforme as expectativas das pessoas ao meu redor.",
-      "Minhas emoções frequentemente se alternam entre extremos de maneira muito rápida.",
-      "Eu sinto que, se eu não controlar as situações, serei traída(o) ou abandonada(o).",
-      // >>> Novos itens (critério 9 DSM-5-TR)
-      "Quando estou muito estressado(a), sinto-me desligado(a) de mim ou do que está ao meu redor (sensação de irrealidade/despersonalização).",
-      "Em momentos de estresse intenso, chego a pensar que os outros podem estar contra mim, mesmo sem provas claras."
-    ];
+                <div class="actions">
+                    <button type="button" class="btn-primary" id="btnCalc">Calcular</button>
+                    <button type="button" class="btn-outline hidden" id="btnWhats">Enviar ao meu psicólogo</button>
+                    <button type="button" class="btn-neutral hidden" id="btnCopy">Copiar relatório</button>
+                </div>
+            </form>
 
-    // Itens reversos (positivos): índices base 1 (mantidos)
-    const REVERSE = new Set([4, 10, 16, 30, 36]);
+            <div class="gauge-box">
+                <div id="gauge" style="width:100%; max-width:700px; margin-inline:auto"></div>
+            </div>
 
-    // Opções (com placeholder obrigatório)
-    const OPTIONS = [
-      { label: "Selecione...", value: "" },
-      { label: "Raramente ou nunca", value: 1 },
-      { label: "De vez em quando", value: 2 },
-      { label: "Com frequência", value: 3 },
-      { label: "Quase sempre/ sempre", value: 4 }
-    ];
+            <div class="results" id="results" aria-live="polite"></div>
 
-    const TOTAL_ITEMS = ITEMS.length; // 47
-    const MIN_SCORE = TOTAL_ITEMS * 1; // 47
-    const MAX_SCORE = TOTAL_ITEMS * 4; // 188
+            <div class="report-box hidden" id="reportBox">
+                <h3>Relatório Integrado (uso orientativo)</h3>
+                <textarea id="reportText" readonly></textarea>
+            </div>
+        </section>
+    </main>
 
-    // Cortes proporcionais (v3): ~50%, ~66.7%, ~80.6%, ~91.7%
-    const CUTS = {
-      low:  Math.round(MIN_SCORE + 0.50 * (MAX_SCORE - MIN_SCORE)),   // <=118
-      mild: Math.round(MIN_SCORE + 0.667 * (MAX_SCORE - MIN_SCORE)),  // <=141
-      mod:  Math.round(MIN_SCORE + 0.806 * (MAX_SCORE - MIN_SCORE)),  // <=161
-      high: Math.round(MIN_SCORE + 0.917 * (MAX_SCORE - MIN_SCORE))   // <=176
-    };
+    <div class="panic-fab"><a href="tel:188" aria-label="Ligar 188 CVV">⚠️ 188 – Ajuda agora</a></div>
 
-    // Estado
-    let gague; // JustGage instancia
-    let lastScore = null;
-    let lastNormalized = 0;
+    <footer>
+        <div>Thaís Campos, Psicóloga Clínica — © 2025 • Este conteúdo é orientativo e não substitui avaliação clínica.</div>
+        <div>Em caso de emergência: <a href="tel:188">ligue 188 (CVV)</a>. Atendimento 24h.</div>
+    </footer>
 
-    // Render dinâmico dos itens
-    const qList = document.getElementById('qList');
-    ITEMS.forEach((text, idx) => {
-      const qn = idx + 1;
-      const wrap = document.createElement('div');
-      wrap.className = 'question';
+    <script>
+        // ===== Configuração dos itens =====
+        const ITEMS = [
+            "Tenho dificuldades em controlar meus impulsos, como gastar dinheiro ou dirigir de forma imprudente.",
+            "Frequentemente sinto um vazio dentro de mim, como se algo estivesse faltando.",
+            "Tenho medo de que as pessoas importantes para mim me deixem.",
+            "Eu sinto que meus relacionamentos são estáveis e duradouros.", // R
+            "Minhas emoções mudam com muita frequência ao longo do dia.",
+            "Às vezes, sinto vontade de me machucar ou tirar minha própria vida.",
+            "Tenho dificuldades em saber quem eu realmente sou.",
+            "Eu frequentemente ajo por impulso, sem considerar o impacto nos outros.",
+            "Sinto-me ansiosa(o) quando alguém próximo a mim não está disponível.",
+            "Eu consigo controlar minhas emoções de maneira eficaz.", // R
+            "Às vezes, sinto que sou várias pessoas diferentes em uma só.",
+            "Eu já considerei seriamente acabar com minha própria vida.",
+            "Eu me preocupo excessivamente com o fato de que as pessoas que amo podem me abandonar.",
+            "Minha emoção muda de maneira muito rápida, e às vezes sinto que não posso controlá-la.",
+            "Tenho uma sensação persistente de que nada me satisfaz completamente.",
+            "Eu sou cuidadosa(o) e penso bem antes de agir.", // R
+            "Eu tenho dificuldade em controlar minha raiva, o que pode levar a explosões.",
+            "Meus relacionamentos são intensos e mudam rapidamente de bons para ruins.",
+            "Eu sinto raiva intensa com frequência, mesmo por coisas pequenas.",
+            "Eu frequentemente tento agradar os outros para evitar que me deixem.",
+            "Eu rapidamente passo de gostar muito de alguém para não gostar nada dessa pessoa.",
+            "Tenho pensamentos suicidas quando estou me sentindo muito mal.",
+            "Sinto que estou sempre à procura de algo que preencha o vazio dentro de mim.",
+            "Às vezes, tomo decisões impulsivas que depois me arrependo.",
+            "Frequentemente sinto que minha autoimagem muda drasticamente em curtos períodos de tempo.",
+            "Minhas emoções são como uma montanha-russa, mudando rapidamente de feliz para triste ou irritada(o).",
+            "Eu idealizo as pessoas e, logo em seguida, fico profundamente desapontada(o) com elas.",
+            "Eu me envolvo em comportamentos arriscados ou perigosos sem pensar nas consequências.",
+            "Tenho dificuldades em manter relacionamentos estáveis.",
+            "Geralmente me sinto em paz com quem eu sou.", // R
+            "Eu me sinto dominada(o) por minhas emoções, e isso me causa sofrimento.",
+            "Minhas emoções mudam de maneira intensa, sem que eu consiga controlá-las.",
+            "Eu já me machuquei intencionalmente para lidar com a dor emocional.",
+            "Eu temo que as pessoas me abandonem se eu não corresponder às suas expectativas.",
+            "Meus relacionamentos são marcados por altos e baixos emocionais intensos.",
+            "Eu consigo controlar minha raiva de maneira eficaz.", // R
+            "Eu tenho dificuldades em planejar minhas ações antes de executá-las.",
+            "As pessoas próximas a mim muitas vezes dizem que sou imprevisível em meus relacionamentos.",
+            "Eu me preocupo constantemente que, se não agir de certa maneira, serei abandonada(o).",
+            "Tenho episódios de tristeza profunda que aparecem sem motivo aparente.",
+            "Tenho dificuldades em encontrar sentido ou propósito nas coisas que faço.",
+            "Eu faço grandes esforços para evitar que as pessoas se afastem de mim.",
+            "Eu sinto que minha autoimagem muda conforme as expectativas das pessoas ao meu redor.",
+            "Minhas emoções frequentemente se alternam entre extremos de maneira muito rápida.",
+            "Eu sinto que, se eu não controlar as situações, serei traída(o) ou abandonada(o).",
+            "Quando estou muito estressado(a), sinto-me desligado(a) de mim ou do que está ao meu redor (sensação de irrealidade/despersonalização).",
+            "Em momentos de estresse intenso, chego a pensar que os outros podem estar contra mim, mesmo sem provas claras."
+        ];
 
-      const lab = document.createElement('label');
-      lab.setAttribute('for', `q${qn}`);
-      lab.textContent = `${qn}. ${text}${REVERSE.has(qn) ? ' *' : ''}`;
+        // Itens reversos (positivos): índices base 1 (mantidos)
+        const REVERSE = new Set([4, 10, 16, 30, 36]);
 
-      const sel = document.createElement('select');
-      sel.id = `q${qn}`;
-      sel.name = `q${qn}`;
-      sel.required = true;
-      OPTIONS.forEach(o => {
-        const opt = document.createElement('option');
-        opt.value = String(o.value);
-        opt.textContent = o.label;
-        if (o.value === "") opt.selected = true;
-        sel.appendChild(opt);
-      });
+        // Opções (com placeholder obrigatório)
+        const OPTIONS = [{
+                label: "Selecione...",
+                value: ""
+            },
+            {
+                label: "Raramente ou nunca",
+                value: 1
+            },
+            {
+                label: "De vez em quando",
+                value: 2
+            },
+            {
+                label: "Com frequência",
+                value: 3
+            },
+            {
+                label: "Quase sempre/ sempre",
+                value: 4
+            }
+        ];
 
-      wrap.appendChild(lab);
-      wrap.appendChild(sel);
-      qList.appendChild(wrap);
-    });
+        const TOTAL_ITEMS = ITEMS.length; // 47
+        const MIN_SCORE = TOTAL_ITEMS * 1; // 47
+        const MAX_SCORE = TOTAL_ITEMS * 4; // 188
 
-    // Inicializa o gauge (0-100%)
-    window.addEventListener('load', () => {
-      if (window.JustGage) {
-        gague = new JustGage({
-          id: 'gauge',
-          value: 0,
-          min: 0,
-          max: 100,
-          title: 'Intensidade de Traços (0–100)',
-          label: '%',
-          levelColors: ['#10b981','#f59e0b','#ef4444','#991b1b']
+        // Cortes proporcionais (v3): ~50%, ~66.7%, ~80.6%, ~91.7%
+        const CUTS = {
+            low: Math.round(MIN_SCORE + 0.50 * (MAX_SCORE - MIN_SCORE)), // <=118
+            mild: Math.round(MIN_SCORE + 0.667 * (MAX_SCORE - MIN_SCORE)), // <=141
+            mod: Math.round(MIN_SCORE + 0.806 * (MAX_SCORE - MIN_SCORE)), // <=161
+            high: Math.round(MIN_SCORE + 0.917 * (MAX_SCORE - MIN_SCORE)) // <=176
+        };
+
+        // Estado
+        let gague; // JustGage instancia
+        let lastScore = null;
+        let lastNormalized = 0;
+
+        // Render dinâmico dos itens
+        const qList = document.getElementById('qList');
+        ITEMS.forEach((text, idx) => {
+            const qn = idx + 1;
+            const wrap = document.createElement('div');
+            wrap.className = 'question';
+
+            const lab = document.createElement('label');
+            lab.setAttribute('for', `q${qn}`);
+            lab.textContent = `${qn}. ${text}${REVERSE.has(qn) ? ' *' : ''}`;
+
+            const sel = document.createElement('select');
+            sel.id = `q${qn}`;
+            sel.name = `q${qn}`;
+            sel.required = true;
+            OPTIONS.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = String(o.value);
+                opt.textContent = o.label;
+                if (o.value === "") opt.selected = true;
+                sel.appendChild(opt);
+            });
+
+            wrap.appendChild(lab);
+            wrap.appendChild(sel);
+            qList.appendChild(wrap);
         });
-      }
-    });
 
-    // Tema dia/noite
-    const modeToggle = document.getElementById('modeToggle');
-    modeToggle.addEventListener('change', (e)=>{
-      if (e.target.checked) document.body.classList.add('theme-day');
-      else document.body.classList.remove('theme-day');
-    });
+        // Inicializa o gauge (0-100%)
+        window.addEventListener('load', () => {
+            if (window.JustGage) {
+                gague = new JustGage({
+                    id: 'gauge',
+                    value: 0,
+                    min: 0,
+                    max: 100,
+                    title: 'Intensidade de Traços (0–100)',
+                    label: '%',
+                    levelColors: ['#10b981', '#f59e0b', '#ef4444', '#991b1b']
+                });
+            }
+        });
 
-    // Cálculo
-    function invertIfNeeded(qn, val){
-      return REVERSE.has(qn) ? (5 - val) : val;
-    }
+        // Tema dia/noite
+        const modeToggle = document.getElementById('modeToggle');
+        modeToggle.addEventListener('change', (e) => {
+            if (e.target.checked) document.body.classList.add('theme-day');
+            else document.body.classList.remove('theme-day');
+        });
 
-    function computeScore(){
-      // Validação custom: destacar itens sem resposta
-      let allOk = true;
-      for (let i = 1; i <= TOTAL_ITEMS; i++){
-        const wrap = document.getElementById(`q${i}`).closest('.question');
-        const v = document.getElementById(`q${i}`).value;
-        const missing = (v === "");
-        wrap.classList.toggle('invalid', missing);
-        if (missing) allOk = false;
-      }
-      if (!allOk) {
-        alert('Existem questões sem resposta. Elas foram destacadas em vermelho.');
-        return null;
-      }
+        // Cálculo
+        function invertIfNeeded(qn, val) {
+            return REVERSE.has(qn) ? (5 - val) : val;
+        }
 
-      let sum = 0;
-      for (let i = 1; i <= TOTAL_ITEMS; i++){
-        const sel = document.getElementById(`q${i}`);
-        const v = Number(sel.value);
-        sum += invertIfNeeded(i, v);
-      }
-      return sum;
-    }
+        function computeScore() {
+            // Validação custom: destacar itens sem resposta
+            let allOk = true;
+            for (let i = 1; i <= TOTAL_ITEMS; i++) {
+                const wrap = document.getElementById(`q${i}`).closest('.question');
+                const v = document.getElementById(`q${i}`).value;
+                const missing = (v === "");
+                wrap.classList.toggle('invalid', missing);
+                if (missing) allOk = false;
+            }
+            if (!allOk) {
+                alert('Existem questões sem resposta. Elas foram destacadas em vermelho.');
+                return null;
+            }
 
-    function normalize(score){
-      const norm = Math.round( ( (score - MIN_SCORE) / (MAX_SCORE - MIN_SCORE) ) * 100 );
-      return Math.min(100, Math.max(0, norm));
-    }
+            let sum = 0;
+            for (let i = 1; i <= TOTAL_ITEMS; i++) {
+                const sel = document.getElementById(`q${i}`);
+                const v = Number(sel.value);
+                sum += invertIfNeeded(i, v);
+            }
+            return sum;
+        }
 
-    function classify(score){
-      if (score <= CUTS.low)  return { label: 'Baixa probabilidade de traços clinicamente relevantes', key: 'low' };
-      if (score <= CUTS.mild) return { label: 'Traços leves (monitorar/psicoeducação)', key: 'mild' };
-      if (score <= CUTS.mod)  return { label: 'Traços moderados (avaliar intervenção)', key: 'mod' };
-      if (score <= CUTS.high) return { label: 'Traços elevados (provável relevância clínica)', key: 'high' };
-      return { label: 'Traços muito elevados (requer avaliação clínica detalhada)', key: 'veryhigh' };
-    }
+        function normalize(score) {
+            const norm = Math.round(((score - MIN_SCORE) / (MAX_SCORE - MIN_SCORE)) * 100);
+            return Math.min(100, Math.max(0, norm));
+        }
 
-    function interpretation(key){
-      const map = {
-        low: 'Sem evidências fortes de traços clinicamente relevantes. Manter autocuidado, rotina de sono e acompanhamento conforme necessidade clínica.',
-        mild: 'Traços leves com impacto baixo. Indicado fortalecer regulação emocional (respiração, grounding), habilidades interpessoais e higiene do sono.',
-        mod: 'Traços moderados com possível impacto funcional. Recomenda-se avaliação clínica estruturada, plano terapêutico focal (DBT/psicoeducação) e metas semanais.',
-        high: 'Traços elevados. Sugerir entrevista clínica completa (DSM‑5‑TR), monitoramento de risco, plano de segurança e treino DBT (tolerância ao mal‑estar/eficácia interpessoal).',
-        veryhigh: 'Traços muito elevados. Encaminhar para avaliação diagnóstica formal, plano de segurança, checagem de comorbidades (TEPT, uso de substâncias, TAB, TDAH) e intervenções intensivas quando indicado.'
-      };
-      return map[key] ?? '';
-    }
+        function classify(score) {
+            if (score <= CUTS.low) return {
+                label: 'Baixa probabilidade de traços clinicamente relevantes',
+                key: 'low'
+            };
+            if (score <= CUTS.mild) return {
+                label: 'Traços leves (monitorar/psicoeducação)',
+                key: 'mild'
+            };
+            if (score <= CUTS.mod) return {
+                label: 'Traços moderados (avaliar intervenção)',
+                key: 'mod'
+            };
+            if (score <= CUTS.high) return {
+                label: 'Traços elevados (provável relevância clínica)',
+                key: 'high'
+            };
+            return {
+                label: 'Traços muito elevados (requer avaliação clínica detalhada)',
+                key: 'veryhigh'
+            };
+        }
 
-    function buildReport({name, date, scoreRaw, scorePct, classLabel, riskFlag}){
-      const lines = [];
-      if (name) lines.push(`Identificação: ${name}`);
-      if (date) lines.push(`Data: ${date}`);
-      lines.push(`\nResumo do rastreio:`);
-      lines.push(`• Escore bruto: ${scoreRaw} (mín ${MIN_SCORE}, máx ${MAX_SCORE}).`);
-      lines.push(`• Intensidade equivalente: ${scorePct}% (0–100).`);
-      lines.push(`• Classificação orientativa: ${classLabel}.`);
-      if (riskFlag) lines.push(`• Alerta: respostas elevadas em itens de autoagressão/ideação — considerar plano de segurança e suporte imediato (188).`);
-      lines.push(`\nInterpretação clínica (uso orientativo):`);
-      lines.push(interpretation(classLabelToKey(classLabel)));
-      lines.push(`\nRecomendações gerais:`);
-      lines.push(`1) Este resultado não confirma diagnóstico. Deve ser integrado à entrevista clínica (critérios DSM‑5‑TR) e ao contexto de vida.`);
-      lines.push(`2) Se houver sofrimento intenso, risco ou dúvidas importantes, procurar ajuda especializada imediatamente (CVV 188).`);
-      lines.push(`3) Psicoeducação sugerida: regulação emocional (respiração diafragmática, grounding 5‑4‑3‑2‑1), higiene do sono, rotina de exercícios, diário de emoções, técnicas breves de mindfulness.`);
-      lines.push(`4) Em caso de recorrência de impulsividade/autoagressão, construir Plano de Segurança (sinais de alerta, estratégias internas, pessoas de apoio, contatos profissionais, restrição de meios).`);
-      lines.push(`\nObservações importantes:`);
-      lines.push(`• Escores podem variar com humor, estresse e contexto. Repetir quando necessário.`);
-      lines.push(`• Traços elevados podem ter sobreposição com TEPT complexo, TAB em fase mista, TDAH e uso de substâncias.`);
-      return lines.join('\n');
-    }
+        function interpretation(key) {
+            const map = {
+                low: 'Sem evidências fortes de traços clinicamente relevantes. Manter autocuidado, rotina de sono e acompanhamento conforme necessidade clínica.',
+                mild: 'Traços leves com impacto baixo. Indicado fortalecer regulação emocional (respiração, grounding), habilidades interpessoais e higiene do sono.',
+                mod: 'Traços moderados com possível impacto funcional. Recomenda-se avaliação clínica estruturada, plano terapêutico focal (DBT/psicoeducação) e metas semanais.',
+                high: 'Traços elevados. Sugerir entrevista clínica completa (DSM-5-TR), monitoramento de risco, plano de segurança e treino DBT (tolerância ao mal-estar/eficácia interpessoal).',
+                veryhigh: 'Traços muito elevados. Encaminhar para avaliação diagnóstica formal, plano de segurança, checagem de comorbidades (TEPT, uso de substâncias, TAB, TDAH) e intervenções intensivas quando indicado.'
+            };
+            return map[key] ?? '';
+        }
 
-    function classLabelToKey(label){
-      if (label.startsWith('Baixa')) return 'low';
-      if (label.startsWith('Traços leves')) return 'mild';
-      if (label.startsWith('Traços moderados')) return 'mod';
-      if (label.startsWith('Traços elevados')) return 'high';
-      return 'veryhigh';
-    }
+        function buildReport({
+            name,
+            date,
+            scoreRaw,
+            scorePct,
+            classLabel,
+            riskFlag
+        }) {
+            const lines = [];
+            if (name) lines.push(`Identificação: ${name}`);
+            if (date) lines.push(`Data: ${date}`);
+            lines.push(`\nResumo do rastreio:`);
+            lines.push(`• Escore bruto: ${scoreRaw} (mín ${MIN_SCORE}, máx ${MAX_SCORE}).`);
+            lines.push(`• Intensidade equivalente: ${scorePct}% (0–100).`);
+            lines.push(`• Classificação orientativa: ${classLabel}.`);
+            if (riskFlag) lines.push(`• Alerta: respostas elevadas em itens de autoagressão/ideação — considerar plano de segurança e suporte imediato (188).`);
+            lines.push(`\nInterpretação clínica (uso orientativo):`);
+            lines.push(interpretation(classLabelToKey(classLabel)));
+            lines.push(`\nRecomendações gerais:`);
+            lines.push(`1) Este resultado não confirma diagnóstico. Deve ser integrado à entrevista clínica (critérios DSM-5-TR) e ao contexto de vida.`);
+            lines.push(`2) Se houver sofrimento intenso, risco ou dúvidas importantes, procurar ajuda especializada imediatamente (CVV 188).`);
+            lines.push(`3) Psicoeducação sugerida: regulação emocional (respiração diafragmática, grounding 5-4-3-2-1), higiene do sono, rotina de exercícios, diário de emoções, técnicas breves de mindfulness.`);
+            lines.push(`4) Em caso de recorrência de impulsividade/autoagressão, construir Plano de Segurança (sinais de alerta, estratégias internas, pessoas de apoio, contatos profissionais, restrição de meios).`);
+            lines.push(`\nObservações importantes:`);
+            lines.push(`• Escores podem variar com humor, estresse e contexto. Repetir quando necessário.`);
+            lines.push(`• Traços elevados podem ter sobreposição com TEPT complexo, TAB em fase mista, TDAH e uso de substâncias.`);
+            return lines.join('\n');
+        }
 
-    // UI handlers
-    const btnCalc = document.getElementById('btnCalc');
-    const btnWhats = document.getElementById('btnWhats');
-    const btnCopy = document.getElementById('btnCopy');
-    const results = document.getElementById('results');
-    const reportBox = document.getElementById('reportBox');
-    const reportText = document.getElementById('reportText');
+        function classLabelToKey(label) {
+            if (label.startsWith('Baixa')) return 'low';
+            if (label.startsWith('Traços leves')) return 'mild';
+            if (label.startsWith('Traços moderados')) return 'mod';
+            if (label.startsWith('Traços elevados')) return 'high';
+            return 'veryhigh';
+        }
 
-    btnCalc.addEventListener('click', () => {
-      const score = computeScore();
-      if (score == null) return;
-      lastScore = score;
-      lastNormalized = normalize(score);
-      if (gague) gague.refresh(lastNormalized);
+        // UI handlers
+        const btnCalc = document.getElementById('btnCalc');
+        const btnWhats = document.getElementById('btnWhats');
+        const btnCopy = document.getElementById('btnCopy');
+        const results = document.getElementById('results');
+        const reportBox = document.getElementById('reportBox');
+        const reportText = document.getElementById('reportText');
 
-      const c = classify(score);
-      const riskFlag = ( Number(document.getElementById('q6').value) >= 3 || Number(document.getElementById('q12').value) >= 3 || Number(document.getElementById('q22').value) >= 3 || Number(document.getElementById('q33').value) >= 3 );
+        btnCalc.addEventListener('click', () => {
+            const score = computeScore();
+            if (score == null) return;
+            lastScore = score;
+            lastNormalized = normalize(score);
+            if (gague) gague.refresh(lastNormalized);
 
-      results.innerHTML = `
+            const c = classify(score);
+            const riskFlag = (Number(document.getElementById('q6').value) >= 3 || Number(document.getElementById('q12').value) >= 3 || Number(document.getElementById('q22').value) >= 3 || Number(document.getElementById('q33').value) >= 3);
+
+            results.innerHTML = `
         <h2>Resultados</h2>
         <div><strong>Intensidade (0–100):</strong> ${lastNormalized}%</div>
         <div><strong>Escore bruto:</strong> ${score} (min ${MIN_SCORE}, máx ${MAX_SCORE})</div>
         <div style="margin-top:4px"><strong>Classificação orientativa:</strong> ${c.label}</div>
         <div style="margin-top:8px">${interpretation(c.key)}</div>
         ${riskFlag ? '<div style="margin-top:10px; padding:10px; background:#fef3c7; border:1px solid #f59e0b; border-radius:8px"><strong>Atenção:</strong> Você marcou itens de autoagressão/ideação suicida em nível elevado. Se precisar de ajuda agora, <a href=\'tel:188\'>ligue 188</a>.</div>' : ''}
-        <div style="margin-top:8px; font-size:13px; color:#475569">*Este resultado não confirma diagnóstico. Utilize com critérios do DSM‑5‑TR e entrevista clínica.</div>
+        <div style="margin-top:8px; font-size:13px; color:#475569">*Este resultado não confirma diagnóstico. Utilize com critérios do DSM-5-TR e entrevista clínica.</div>
       `;
 
-      // Monta relatório rico
-      const fullName = (document.getElementById('fullName').value || '').trim();
-      const date = (document.getElementById('date').value || '').trim();
-      const report = buildReport({name: fullName, date, scoreRaw: score, scorePct: lastNormalized, classLabel: c.label, riskFlag});
-      reportText.value = report;
-      reportBox.classList.remove('hidden');
+            // Monta relatório rico
+            const fullName = (document.getElementById('fullName').value || '').trim();
+            const date = (document.getElementById('date').value || '').trim();
+            const report = buildReport({
+                name: fullName,
+                date,
+                scoreRaw: score,
+                scorePct: lastNormalized,
+                classLabel: c.label,
+                riskFlag
+            });
+            reportText.value = report;
+            reportBox.classList.remove('hidden');
 
-      btnWhats.classList.remove('hidden');
-      btnCopy.classList.remove('hidden');
-    });
+            btnWhats.classList.remove('hidden');
+            btnCopy.classList.remove('hidden');
+        });
 
-    btnWhats.addEventListener('click', () => {
-      if (lastScore == null) return;
-      const fullName = (document.getElementById('fullName').value || '').trim();
-      const date = (document.getElementById('date').value || '').trim();
-      const msg = reportText.value || `Rastreio de traços borderline — Intensidade: ${lastNormalized}%. Escore: ${lastScore}.`;
-      const who = fullName ? `Pessoa: ${fullName}\n` : '';
-      const when = date ? `Data: ${date}\n` : '';
-      const finalMsg = `${who}${when}${msg}`;
-      const url = `https://wa.me/?text=${encodeURIComponent(finalMsg)}`;
-      window.open(url, '_blank');
-    });
+        btnWhats.addEventListener('click', () => {
+            if (lastScore == null) return;
+            const fullName = (document.getElementById('fullName').value || '').trim();
+            const date = (document.getElementById('date').value || '').trim();
+            const msg = reportText.value || `Rastreio de traços borderline — Intensidade: ${lastNormalized}%. Escore: ${lastScore}.`;
+            const who = fullName ? `Pessoa: ${fullName}\n` : '';
+            const when = date ? `Data: ${date}\n` : '';
+            const finalMsg = `${who}${when}${msg}`;
+            const url = `https://wa.me/5535984647323?text=${encodeURIComponent(finalMsg)}`;
+            window.open(url, '_blank');
+        });
 
-    btnCopy.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(reportText.value);
-        btnCopy.textContent = 'Relatório copiado!';
-        setTimeout(()=> btnCopy.textContent = 'Copiar relatório', 2000);
-      } catch(e) {
-        alert('Não foi possível copiar automaticamente. Selecione o texto e copie manualmente.');
-      }
-    });
-  </script>
+        btnCopy.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(reportText.value);
+                btnCopy.textContent = 'Relatório copiado!';
+                setTimeout(() => btnCopy.textContent = 'Copiar relatório', 2000);
+            } catch (e) {
+                alert('Não foi possível copiar automaticamente. Selecione o texto e copie manualmente.');
+            }
+        });
+    </script>
 
-  <noscript>
-    Habilite JavaScript para utilizar o instrumento.
-  </noscript>
+    <noscript>
+        Habilite JavaScript para utilizar o instrumento.
+    </noscript>
 </body>
+
 </html>
